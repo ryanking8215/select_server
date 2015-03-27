@@ -26,7 +26,6 @@ typedef struct Client {
     unsigned char send_data[CLIENT_SEND_BUF_SIZE];
     HeadBuffer write_head_buf;
 
-    int non_writeable_times; // 不可写次数
     int is_writing; // 是否在发送数据
     TcpServer *server;
 
@@ -54,12 +53,15 @@ struct ServerHooks {
     void (* post_init)(TcpServer *server);
     void (* pre_run)(TcpServer *server);
 
+    // client 钩子
     void (* client_init)(Client *c);
     // 返回消耗的read_buf.data的size
     int (* client_process)(Client *c);
     void (* client_timeout)(Client *c);
     void (* pre_client_close)(Client *c);
     void (* post_client_close)(Client *c);
+    // 当clientsock的写事件触发
+    void (* client_on_write)(Client *c);
 };
 
 // api for server

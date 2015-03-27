@@ -98,13 +98,17 @@ int client_send(Client *c, void *data, int len)
 static void client_real_write(Client *c)
 {
     HeadBuffer *buf = &c->write_head_buf;
-    c->non_writeable_times = 0;
+
+    TcpServer *server = c->server;
+
+    if (server->hooks && server->hooks->client_on_write) {
+        server->hooks->client_on_write(c);
+    }
 
     //lock
     size_t data_size = buf->data_size;
 
     if (data_size == 0) {
-        c->non_writeable_times = 0;
         // 没有发送数据，取消发送事件
         FD_CLR(c->sock,&c->server->writefs);
         c->is_writing = 0;

@@ -57,10 +57,18 @@ static void echo_client_close(Client *c)
     free(c->user_data);
 }
 
+static void echo_on_write(Client *c)
+{
+    if (c==NULL) return;
+    EchoClient *ec = (EchoClient *)malloc(sizeof(*ec));
+    ec->non_writeable_times=0;
+}
+
 struct ServerHooks EchoServerHook = {
     .client_init = echo_client_init,
     .client_process = echo_process,
     .client_timeout = echo_timeout,
+    .client_on_write = echo_on_write,
     .post_client_close = echo_client_close,
 };
 
